@@ -1,179 +1,225 @@
 import streamlit as st
-import time
 
-# --- CONFIGURACIÓN DE LA PÁGINA ---
-st.set_page_config(page_title="🇬🇧 English Exam: Jobs!", page_icon="👨‍🚒", layout="centered")
+# --- CONFIGURACIÓN ---
+st.set_page_config(page_title="🇬🇧 English Master Class", page_icon="🎓", layout="wide")
 
-# --- ESTILOS VISUALES (CSS) PARA NIÑOS ---
+# --- ESTILOS CSS (Para que se vea bonito) ---
 st.markdown("""
     <style>
-    .big-font { font-size:22px !important; color: #154360; font-weight: bold; }
-    .question-box { background-color: #E8F8F5; padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 2px solid #A3E4D7; }
-    .stButton>button {
-        background-color: #F1C40F; color: black; border-radius: 12px; font-weight: bold; border: 2px solid #D4AC0D;
-    }
-    .stTabs [data-baseweb="tab-list"] { gap: 10px; }
-    .stTabs [data-baseweb="tab"] { background-color: #D6EAF8; border-radius: 5px; }
-    .stTabs [aria-selected="true"] { background-color: #AED6F1; font-weight: bold; }
+    .big-font { font-size:20px !important; color: #154360; font-weight: bold; }
+    .theory-box { background-color: #D4E6F1; padding: 20px; border-radius: 10px; border-left: 5px solid #2980B9; margin-bottom: 20px; }
+    .correct { background-color: #D5F5E3; padding: 10px; border-radius: 5px; border: 1px solid #2ECC71; color: #186A3B; margin-top: 5px;}
+    .incorrect { background-color: #FADBD8; padding: 10px; border-radius: 5px; border: 1px solid #CB4335; color: #943126; margin-top: 5px;}
+    .stButton>button { width: 100%; background-color: #F1C40F; font-size: 20px; font-weight: bold; color: black; padding: 10px; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- ESTADO (SCORE Y RESPUESTAS) ---
-if 'score' not in st.session_state:
-    st.session_state.score = 0
-if 'answered' not in st.session_state:
-    st.session_state.answered = set() # Para guardar qué IDs ya se respondieron
+# --- ESTADO DE LA APLICACIÓN ---
+if 'submitted' not in st.session_state:
+    st.session_state.submitted = False
 
-# --- FUNCIÓN PARA VERIFICAR RESPUESTAS ---
-def check_answer(q_id, user_ans, correct_ans, explanation=""):
-    """
-    q_id: identificador único de la pregunta
-    user_ans: respuesta del usuario
-    correct_ans: respuesta correcta (o lista de correctas)
-    explanation: texto para explicar por qué
-    """
-    if q_id in st.session_state.answered:
-        st.warning("⚠️ Ya respondiste esta pregunta.")
-        return
+# --- PESTAÑAS PRINCIPALES ---
+tab_teoria, tab_examen = st.tabs(["📚 1. LECCIÓN (Estudia aquí)", "✍️ 2. EXAMEN (20 Preguntas)"])
 
-    # Normalizar para comparaciones de texto
-    if isinstance(user_ans, str):
-        is_correct = user_ans.strip().lower().replace('?','').replace('.','') == correct_ans.strip().lower().replace('?','').replace('.','')
-    elif isinstance(user_ans, list): # Para el ejercicio de ordenar
-        is_correct = user_ans == correct_ans
-    else:
-        is_correct = user_ans == correct_ans
-
-    if is_correct:
-        st.canvas = st.balloons()
-        st.success("✅ ¡CORRECTO! ¡Muy bien!")
-        st.session_state.score += 1
-    else:
-        st.error(f"❌ Casi... La respuesta era: {correct_ans}")
-        if explanation:
-            st.info(f"💡 {explanation}")
+# ==============================================================================
+# PESTAÑA 1: TEORÍA (Basada en la foto del libro)
+# ==============================================================================
+with tab_teoria:
+    st.title("🎓 Lección: Present Simple & Jobs")
     
-    st.session_state.answered.add(q_id)
+    st.markdown("""
+    <div class="theory-box">
+        <h3>1️⃣ La Regla de Oro: DO vs DOES</h3>
+        <p>Para hacer preguntas en inglés, necesitamos un ayudante (Auxiliar). Depende de la persona:</p>
+        <ul>
+            <li><b>DOES</b> 👉 Se usa con la "Tercera Persona" (El jefe/a): <b>He, She, It</b>.</li>
+            <li><b>DO</b> 👉 Se usa con el resto: <b>I, You, We, They</b>.</li>
+        </ul>
+        <p><i>Ejemplo:</i> <b>Does</b> she work? / <b>Do</b> you work?</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-# --- CABECERA ---
-st.title("👨‍⚕️ Examen de Inglés: Jobs & Routines 👩‍🌾")
-st.markdown("¡Hola! 👋 Vamos a demostrar todo lo que sabes.")
-st.markdown(f"**Puntuación actual:** {st.session_state.score} puntos ⭐")
-st.markdown("---")
-
-# --- PESTAÑAS ---
-tab1, tab2 = st.tabs(["📝 Ejercicios Prácticos", "🚀 Test Rápido (10 Preguntas)"])
-
-# ==========================================
-# PESTAÑA 1: LOS 5 TIPOS DE EJERCICIOS
-# ==========================================
-with tab1:
-    st.header("Parte 1: Práctica Variada")
-
-    # 1. GRAMÁTICA
-    st.markdown('<div class="question-box"><p class="big-font">1. Elige: Do o Does</p></div>', unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
-        ans1 = st.radio("She _____ work in a hospital?", ["Do", "Does"], key="p1_q1")
-        if st.button("Comprobar #1", key="btn_p1_1"):
-            check_answer("ex1_1", ans1, "Does", "She es 3ª persona -> Does.")
+        st.info("🚨 **¡OJO!** Cuando usas **DOES**, el verbo principal **NO** lleva la 's'.\n\n* MAL: Does she works?\n* BIEN: Does she **work**?")
     with c2:
-        ans2 = st.radio("_____ you wear a uniform?", ["Do", "Does"], key="p1_q2")
-        if st.button("Comprobar #2", key="btn_p1_2"):
-            check_answer("ex1_2", ans2, "Do", "You usa Do.")
+        st.warning("🗣️ **Respuestas Cortas (Short Answers)**\n\n* Yes, he does.\n* No, he doesn't.\n* Yes, I do.\n* No, I don't.")
 
     st.markdown("---")
-
-    # 2. ORDENAR (TIPO DUOLINGO)
-    st.markdown('<div class="question-box"><p class="big-font">2. Ordena la frase (Estilo Duolingo)</p></div>', unsafe_allow_html=True)
-    st.write("Frase meta: *¿Trabaja él fuera?*")
-    options_scramble = ["outdoors", "Does", "he", "work", "?"]
-    user_order = st.multiselect("Selecciona las palabras en orden:", options=options_scramble, key="p1_q3")
-    correct_order = ["Does", "he", "work", "outdoors", "?"]
+    st.subheader("2️⃣ Vocabulario del Libro (Jobs)")
     
-    if st.button("Comprobar Orden", key="btn_p1_3"):
-        check_answer("ex2", user_order, correct_order, "Orden: Auxiliar (Does) + Persona (he) + Verbo (work) + Lugar.")
+    col_a, col_b, col_c = st.columns(3)
+    with col_a:
+        st.image("https://cdn-icons-png.flaticon.com/512/3063/3063823.png", width=50)
+        st.markdown("**Work outdoors**\n\n(Trabajar fuera/aire libre)")
+    with col_b:
+        st.image("https://cdn-icons-png.flaticon.com/512/1995/1995667.png", width=50)
+        st.markdown("**Wear a uniform**\n\n(Llevar uniforme)")
+    with col_c:
+        st.image("https://cdn-icons-png.flaticon.com/512/4829/4829988.png", width=50)
+        st.markdown("**Work at night**\n\n(Trabajar de noche)")
 
-    st.markdown("---")
+# ==============================================================================
+# PESTAÑA 2: EL EXAMEN (20 Preguntas)
+# ==============================================================================
+with tab_examen:
+    st.header("📝 ¡A demostrar lo que sabes!")
+    st.write("Responde las 20 preguntas. Al final, pulsa el botón amarillo para corregir todo.")
+    st.divider()
 
-    # 3. TRADUCIR A ESPAÑOL
-    st.markdown('<div class="question-box"><p class="big-font">3. Traduce al Español</p></div>', unsafe_allow_html=True)
-    st.info("Does she wear a uniform?")
-    ans3 = st.text_input("Escribe en español:", key="p1_q4")
-    if st.button("Comprobar Traducción", key="btn_p1_4"):
-        # Aceptamos variaciones
-        validas = ["ella lleva uniforme", "¿ella lleva uniforme?", "lleva uniforme", "¿lleva uniforme?", "usa uniforme"]
-        # Lógica manual simple para aceptar varias
-        normalized = ans3.lower().strip().replace('¿','').replace('?','')
-        match = False
-        for v in validas:
-            if v.replace('¿','').replace('?','') in normalized:
-                match = True
-        if match:
-             check_answer("ex3", "ok", "ok") # Truco para reutilizar la funcion
-        else:
-             check_answer("ex3", "fail", "ok", "Respuesta: ¿Lleva ella uniforme?")
-
-    st.markdown("---")
-
-    # 4. TRADUCIR A INGLÉS
-    st.markdown('<div class="question-box"><p class="big-font">4. Traduce al Inglés</p></div>', unsafe_allow_html=True)
-    st.info("¿Trabaja él con animales?")
-    ans4 = st.text_input("Escribe en inglés (Usa 'Does'):", key="p1_q5")
-    if st.button("Comprobar Inglés", key="btn_p1_5"):
-        check_answer("ex4", ans4, "Does he work with animals", "Recuerda: Does + he + work + with animals")
-
-    st.markdown("---")
-
-    # 5. SHORT ANSWERS
-    st.markdown('<div class="question-box"><p class="big-font">5. Respuesta Corta</p></div>', unsafe_allow_html=True)
-    st.write("**Pregunta:** Does a firefighter work in an office? 🚒")
-    ans5 = st.selectbox("Elige la respuesta:", ["Select...", "Yes, he does", "No, he doesn't", "Yes, he is"], key="p1_q6")
-    if st.button("Comprobar Respuesta", key="btn_p1_6"):
-        check_answer("ex5", ans5, "No, he doesn't")
-
-
-# ==========================================
-# PESTAÑA 2: EL TEST DE 10 PREGUNTAS
-# ==========================================
-with tab2:
-    st.header("Parte 2: Quiz de 10 Preguntas")
+    # --- BLOQUE 1: RELLENAR HUECOS (DO/DOES) ---
+    st.subheader("Parte 1: ¿Do o Does? (Gramática)")
     
-    # Base de datos de preguntas
-    quiz_data = [
-        {"q": "1. Completa: '_____ she work in a hospital?'", "opts": ["Do", "Does", "Is"], "corr": "Does", "exp": "She es 3ª persona."},
-        {"q": "2. Traduce: '¿Lleva él uniforme?'", "opts": ["Do he wear a uniform?", "Does he wears a uniform?", "Does he wear a uniform?"], "corr": "Does he wear a uniform?", "exp": "Con Does, el verbo no lleva 's'."},
-        {"q": "3. Responde: 'Does a firefighter work in an office?'", "opts": ["Yes, he does.", "No, he doesn't.", "No, he don't."], "corr": "No, he doesn't.", "exp": "Los bomberos no trabajan en oficinas."},
-        {"q": "4. Orden correcto:", "opts": ["Does she work with animals?", "Does work she with animals?", "She does work with animals?"], "corr": "Does she work with animals?", "exp": "Does + Sujeto + Verbo..."},
-        {"q": "5. Completa: '_____ you work at night?'", "opts": ["Does", "Do", "Are"], "corr": "Do", "exp": "Con 'You' usamos Do."},
-        {"q": "6. ¿Qué significa 'work outdoors'?", "opts": ["Trabajar en oficina", "Trabajar de noche", "Trabajar al aire libre"], "corr": "Trabajar al aire libre", "exp": "Outdoors = Fuera."},
-        {"q": "7. Negativa correcta: 'She _____ in a hospital.'", "opts": ["don't work", "doesn't works", "doesn't work"], "corr": "doesn't work", "exp": "Doesn't + verbo infinitivo."},
-        {"q": "8. Si la respuesta es 'Yes, I do', la pregunta es...", "opts": ["Does she...?", "Do you...?", "Do they...?"], "corr": "Do you...?", "exp": "Pregunta a ti (you) -> Respondes yo (I)."},
-        {"q": "9. ¿Quién trabaja 'outdoors'?", "opts": ["Doctor", "Farmer", "Secretary"], "corr": "Farmer", "exp": "El granjero trabaja en el campo."},
-        {"q": "10. Afirmativa: 'He _____ a uniform.'", "opts": ["wear", "wears", "wearing"], "corr": "wears", "exp": "En afirmativa, He/She lleva 's'."}
-    ]
+    col1, col2 = st.columns(2)
+    with col1:
+        q1 = st.radio("1. _____ she work in a hospital?", ["Do", "Does", "Is"], key="q1", horizontal=True)
+        q2 = st.radio("2. _____ you wear a uniform?", ["Do", "Does", "Are"], key="q2", horizontal=True)
+        q3 = st.radio("3. _____ he work with animals?", ["Do", "Does", "Is"], key="q3", horizontal=True)
+    with col2:
+        q4 = st.radio("4. _____ they work at night?", ["Do", "Does", "Have"], key="q4", horizontal=True)
+        q5 = st.radio("5. _____ the doctor work indoors?", ["Do", "Does", "Is"], key="q5", horizontal=True)
 
-    # Bucle para generar las preguntas automáticamente
-    for i, item in enumerate(quiz_data):
-        st.markdown(f"**{item['q']}**")
-        # Usamos radio buttons con claves únicas basadas en el índice 'i'
-        user_choice = st.radio(f"Opción pregunta {i+1}:", item['opts'], key=f"quiz_radio_{i}", label_visibility="collapsed")
+    st.divider()
+
+    # --- BLOQUE 2: VOCABULARIO Y RESPUESTAS CORTAS ---
+    st.subheader("Parte 2: Vocabulario y Respuestas")
+    
+    col3, col4 = st.columns(2)
+    with col3:
+        q6 = st.selectbox("6. Un granjero (Farmer) trabaja...", ["indoors", "outdoors", "in an office"], key="q6")
+        q7 = st.selectbox("7. Pregunta: Does he work? -> Respuesta Negativa:", ["No, he don't", "No, he doesn't", "No, he isn't"], key="q7")
+        q8 = st.selectbox("8. Traduce: 'Work at night'", ["Trabajar de día", "Trabajar de noche", "Trabajar en casa"], key="q8")
+    with col4:
+        q9 = st.selectbox("9. ¿Quién lleva uniforme (wears a uniform)?", ["A firefighter", "A writer", "A baby"], key="q9")
+        q10 = st.selectbox("10. Pregunta: Do you like apples? -> Respuesta Afirmativa:", ["Yes, I does", "Yes, I like", "Yes, I do"], key="q10")
+
+    st.divider()
+
+    # --- BLOQUE 3: ORDENAR FRASES (TIPO DUOLINGO) ---
+    st.subheader("Parte 3: Ordena la frase (Estilo Duolingo)")
+    st.info("Selecciona las palabras en el orden correcto para formar la frase.")
+
+    st.markdown("**11. ¿Trabaja ella fuera?**")
+    opts_11 = ["outdoors", "Does", "she", "work", "?"]
+    q11 = st.multiselect("Construye la frase 11:", opts_11, key="q11")
+
+    st.markdown("**12. ¿Llevan ellos uniforme?**")
+    opts_12 = ["uniform", "Do", "wear", "they", "a", "?"]
+    q12 = st.multiselect("Construye la frase 12:", opts_12, key="q12")
+
+    st.markdown("**13. Él no trabaja en un zoo.**")
+    opts_13 = ["He", "work", "doesn't", "in a zoo", "."]
+    q13 = st.multiselect("Construye la frase 13:", opts_13, key="q13")
+
+    st.markdown("**14. ¿Trabajas tú de noche?**")
+    opts_14 = ["at", "night", "work", "you", "Do", "?"]
+    q14 = st.multiselect("Construye la frase 14:", opts_14, key="q14")
+
+    st.markdown("**15. Ella trabaja con animales.**")
+    opts_15 = ["works", "She", "with", "animals", "."]
+    q15 = st.multiselect("Construye la frase 15:", opts_15, key="q15")
+
+    st.divider()
+
+    # --- BLOQUE 4: TRADUCCIÓN / ESCRITURA ---
+    st.subheader("Parte 4: Escribe la frase (Writing)")
+    st.caption("Escribe en Inglés o Español según se pida. Cuidado con la ortografía.")
+
+    q16 = st.text_input("16. Traduce al español: 'Does she wear a uniform?'", key="q16")
+    q17 = st.text_input("17. Traduce al inglés: '¿Trabaja él en una oficina?' (Pista: in an office)", key="q17")
+    q18 = st.text_input("18. Escribe la pregunta para esta respuesta: '________? Yes, I do.' (Pista: Pregunta con You)", key="q18")
+    q19 = st.text_input("19. Pon en negativa: 'He works'", key="q19")
+    q20 = st.text_input("20. Pon en afirmativa: 'Does she play?' -> 'Yes, she ____'", key="q20")
+
+    st.divider()
+
+    # ==============================================================================
+    # LÓGICA DE CORRECCIÓN (AL PULSAR EL BOTÓN)
+    # ==============================================================================
+    
+    if st.button("🏁 CORREGIR EXAMEN AHORA"):
+        st.session_state.submitted = True
+        score = 0
         
-        if st.button(f"Responder P{i+1}", key=f"btn_quiz_{i}"):
-            check_answer(f"quiz_{i}", user_choice, item['corr'], item['exp'])
-        st.divider()
+        st.success("¡Examen entregado! Mira abajo tus correcciones 👇")
 
-# --- BARRA LATERAL (SIDEBAR) ---
-st.sidebar.header("🏆 Tu Progreso")
-total_questions = 6 + 10 # 6 del ej 1, 10 del quiz
-st.sidebar.metric("Puntos Totales", f"{st.session_state.score} / {total_questions}")
+        # --- RESPUESTAS CORRECTAS ---
+        # Bloque 1
+        r1, r2, r3, r4, r5 = "Does", "Do", "Does", "Do", "Does"
+        # Bloque 2
+        r6, r7, r8, r9, r10 = "outdoors", "No, he doesn't", "Trabajar de noche", "A firefighter", "Yes, I do"
+        # Bloque 3 (Listas)
+        r11 = ["Does", "she", "work", "outdoors", "?"]
+        r12 = ["Do", "they", "wear", "a", "uniform", "?"]
+        r13 = ["He", "doesn't", "work", "in a zoo", "."]
+        r14 = ["Do", "you", "work", "at", "night", "?"]
+        r15 = ["She", "works", "with", "animals", "."] # OJO: works con S
+        
+        # FUNCION HELPER PARA MOSTRAR RESULTADO
+        def show_result(user, correct, num, explanation=""):
+            is_ok = False
+            # Comparación flexible para texto
+            if isinstance(user, str):
+                if user.lower().strip().replace('?','').replace('.','') == correct.lower().strip().replace('?','').replace('.',''):
+                    is_ok = True
+                # Excepciones manuales para traducciones
+                if num == 16 and "lleva uniforme" in user.lower(): is_ok = True
+                if num == 19 and "doesn't work" in user.lower(): is_ok = True
+                if num == 20 and "plays" in user.lower(): is_ok = True
+                if num == 18 and "do you" in user.lower(): is_ok = True
+            elif isinstance(user, list):
+                if user == correct: is_ok = True
+            
+            if is_ok:
+                st.markdown(f"<div class='correct'>✅ <b>Pregunta {num}:</b> ¡Correcto!</div>", unsafe_allow_html=True)
+                return 1
+            else:
+                correct_str = correct if isinstance(correct, str) else " ".join(correct)
+                st.markdown(f"<div class='incorrect'>❌ <b>Pregunta {num}:</b> Mal. La respuesta era: <b>{correct_str}</b>. <br><i>{explanation}</i></div>", unsafe_allow_html=True)
+                return 0
 
-if st.session_state.score > 5:
-    st.sidebar.image("https://cdn-icons-png.flaticon.com/512/190/190411.png", width=100)
-    st.sidebar.write("¡Lo estás haciendo genial!")
+        # --- CORRECCIÓN BLOQUE A BLOQUE ---
+        st.subheader("📊 Resultados:")
+        
+        # Bloque 1
+        score += show_result(q1, r1, 1, "She es 3ª persona (Does).")
+        score += show_result(q2, r2, 2, "You usa Do.")
+        score += show_result(q3, r3, 3, "He es 3ª persona (Does).")
+        score += show_result(q4, r4, 4, "They usa Do.")
+        score += show_result(q5, r5, 5, "The doctor = He/She -> Does.")
+        
+        # Bloque 2
+        score += show_result(q6, r6, 6)
+        score += show_result(q7, r7, 7, "Negativa de Does -> Doesn't.")
+        score += show_result(q8, r8, 8)
+        score += show_result(q9, r9, 9)
+        score += show_result(q10, r10, 10, "Pregunta con Do -> Respuesta con do.")
 
-# Botón de reinicio
-if st.sidebar.button("🔄 Empezar de cero"):
-    st.session_state.score = 0
-    st.session_state.answered = set()
-    st.rerun()
+        # Bloque 3
+        score += show_result(q11, r11, 11, "Orden: Auxiliar + Sujeto + Verbo + Lugar.")
+        score += show_result(q12, r12, 12, "Wear a uniform = llevar uniforme.")
+        score += show_result(q13, r13, 13, "Negativa: He doesn't work.")
+        score += show_result(q14, r14, 14, "Do you work...?")
+        score += show_result(q15, r15, 15, "Afirmativa con She -> El verbo lleva 'S' (works).")
+
+        # Bloque 4
+        score += show_result(q16, "Ella lleva uniforme", 16)
+        score += show_result(q17, "Does he work in an office", 17)
+        score += show_result(q18, "Do you work", 18, "Si respondo 'yo', la pregunta es a 'ti'.")
+        score += show_result(q19, "He doesn't work", 19, "Doesn't + verbo sin S.")
+        score += show_result(q20, "plays", 20, "She plays (con S).")
+
+        # --- NOTA FINAL ---
+        st.markdown("---")
+        final_score = score
+        st.metric(label="NOTA FINAL", value=f"{final_score} / 20")
+        
+        if final_score == 20:
+            st.balloons()
+            st.success("🏆 ¡PERFECTO! Eres un maestro del inglés.")
+        elif final_score >= 15:
+            st.success("🌟 ¡Muy bien! Casi perfecto.")
+        elif final_score >= 10:
+            st.warning("🙂 Aprobado. Repasa los fallos en rojo.")
+        else:
+            st.error("💪 Hay que estudiar un poco más la lección de la pestaña 1.")
